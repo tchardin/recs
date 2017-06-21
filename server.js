@@ -35,10 +35,6 @@ server.get('/', (req, res) => {
   res.sendFile('index.html')
 })
 
-server.get('/activate', (req, res) => {
-  res.sendFile('activate.html')
-})
-
 server.get('/login', (req, res) => {
   const state = generateRandomString(16)
   res.cookie(stateKey, state)
