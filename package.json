@@ -1,0 +1,29 @@
+{
+  "name": "recs",
+  "version": "1.0.0",
+  "description": "Decentralized marketplace for electric vehicles miles tokens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tchardin/recs.git"
+  },
+  "author": "tdot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tchardin/recs/issues"
+  },
+  "homepage": "https://github.com/tchardin/recs#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.15.3",
+    "express-static": "^1.1.0",
+    "node-fetch": "^1.7.1",
+    "querystring": "^0.2.0",
+    "request": "^2.81.0",
+    "twilio": "^3.4.0"
+  }
+}

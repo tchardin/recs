@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+      <title>RECoin</title>
+      <script src="https://unpkg.com/vue"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+      <link rel=stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.0/css/bulma.min.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+      <style type="text/css">
+
+      </style>
+</head>
+<body>
+      <div id="app">
+        <div class="section" v-if="loggedOut">
+          <div class="container has-text-centered">
+            <h1 class="title is-1">RECoin</h1>
+            <a class="button" href="/login">Sign in with Uber</a>
+          </div>
+        </div>
+        <div class="section" v-else-if="user">
+          <div class="container">
+                <h1 class="title">Welcome {{user.first_name}}!</h1>
+                <div class="card">
+                  <header class="card-header">
+                    <p class="card-header-title">
+                      RECoins balance
+                    </p>
+                  </header>
+                  <div class="card-content">
+                    <div class="content">
+                      <p class="title is-1" >{{balance}}</p>
+                    </div>
+                  </div>
+                  <footer class="card-footer">
+                    <a class="card-footer-item" href='/activate'>
+                      <p>Activate automatic offsetting</p>
+                      <span class="icon">
+                        <i class="fa fa-angle-right"></i>
+                      </span>
+                    </a>
+                  </footer>
+                </div>
+                <h2 class="title is-5"> </h2>
+                <h2 class="title is-5">Offset CO2 from your past rides</h2>
+                <div class="box" v-for="ride in history">
+                  <article class="media">
+                    <div class="media-left" v-on:click="toggleb(ride.distance)">
+                       {{ Number(Math.round(ride.distance+'e'+2)+'e-'+2) }} Miles
+                    </div>
+                    <span class="icon media-right" v-if="check === ride.distance">
+                      <i class="fa fa-check"></i>
+                    </span>
+                    <div class="media-content" v-if="offset === ride.distance">
+                      <button class="delete is-pulled-right" v-on:click="toggleb(ride.distance)"></button>
+                      <div class="content">
+                        <p>
+                          Buy {{ride.distance}} RECoins for <strong>${{Number(Math.round(ride.distance*0.05+'e'+2)+'e-'+2)}}</strong>
+                        </p>
+                        <button class="button is-black" v-on:click="buy(ride.distance)">Confirm</button>
+                      </div>
+                    </div>
+                  </article>
+              </div>
+          </div>
+        </div>
+        <div class="section" v-else-if="purchase">
+          <div class="container">
+            Purchased!
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+        const getHashParams = () => {
+          var hashParams = {}
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1)
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2])
+          }
+          return hashParams
+        }
+
+        var app = new Vue({
+          el: '#app',
+          data: {
+            loggedOut: true,
+            user: null,
+            history: null,
+            offset: null,
+            purchase: false,
+            balance: 0,
+            check: null
+          },
+          methods: {
+            buy: function (distance) {
+              this.balance = Number(Math.round((this.balance + distance)+'e'+6)+'e-'+6)
+              this.check = distance
+              this.offset = null
+              alert('Congratulations!')
+            },
+
+            toggleb: function (distance) {
+              this.check = null
+              if (!this.offset) {
+                this.offset = distance
+              } else {
+                this.offset = null
+              }
+            }
+
+          },
+          mounted() {
+            var params = getHashParams()
+            var access_token = params.access_token,
+                refresh_token = params.refresh_token,
+                error = params.error
+            if (error) {
+              alert('There was an error during the authentication')
+            } else if (access_token){
+              this.loggedOut = false
+              var qs = 'access_token=' + encodeURIComponent(access_token)
+              fetch('https://api.uber.com/v1.2/me?' + qs, {
+                method: 'GET',
+                headers: {
+                  'Accept-Language': 'en_US',
+                  'Content-Type': 'application/json'
+                }
+              }).then(data => data.json())
+              .then(json => this.user = json)
+              fetch('https://api.uber.com/v1.2/history?' + qs + '&limit=10', {
+                method: 'GET',
+                headers: {
+                  'Accept-Language': 'en_US',
+                  'Content-Type': 'application/json'
+                }
+              }).then(data => data.json())
+              .then(json => this.history = json.history)
+            }
+          }
+        })
+        </script>
+</body>
+</html>
