@@ -31,10 +31,6 @@ const server = express()
 server.use(express.static('public'))
       .use(cookieParser())
 
-server.get('/', (req, res) => {
-  res.sendFile('index.html')
-})
-
 server.get('/login', (req, res) => {
   const state = generateRandomString(16)
   res.cookie(stateKey, state)
