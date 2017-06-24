@@ -28,8 +28,16 @@ const stateKey = 'uber_auth_state';
 
 const server = express()
 
-server.use(express.static('public'))
-      .use(cookieParser())
+server.use(cookieParser())
+
+server.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html')
+})
+
+server.get('/activate', (req, res) => {
+  res.sendFile(__dirname + '/activate.html')
+})
+
 
 server.get('/login', (req, res) => {
   const state = generateRandomString(16)
